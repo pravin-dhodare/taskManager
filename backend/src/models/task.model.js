@@ -15,8 +15,8 @@ const taskSchema = new mongoose.Schema({
         default: 'TODO'
     },
     linkedFile: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'File'
+        type: String,
+        default: null
     },
     createdOn: {
         type: Date,

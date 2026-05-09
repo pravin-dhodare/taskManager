@@ -25,7 +25,11 @@ const getTaskById = catchAsync (async (req, res) => {
 
 // Create a new task
 const createTask = catchAsync (async (req, res) => {
-    const taskData = req.body;
+    const taskData = req.body || {};
+    if (req.file) {
+        // store relative path so it's easier to serve or reference
+        taskData.linkedFile = req.file.filename || req.file.path;
+    }
     const newTask = await taskService.createTask(taskData);
     if (!newTask) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create task');
@@ -36,7 +40,10 @@ const createTask = catchAsync (async (req, res) => {
 // Update a task by ID
 const updateTask = catchAsync (async (req, res) => {
     const { id } = req.params;
-    const taskData = req.body;
+    const taskData = req.body || {};
+    if (req.file) {
+        taskData.linkedFile = req.file.filename || req.file.path;
+    }
     const updatedTask = await taskService.updateTask(id, taskData);
     if (!updatedTask) {
         throw new ApiError(httpStatus.NOT_FOUND, 'No task found');
