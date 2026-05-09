@@ -28,7 +28,7 @@ const deleteTask = async (id) => {
     return deletedTask;
 }
 
-module.exports = {
+module.exports.taskService = {
     getAllTasks,
     getTaskById,
     createTask,
