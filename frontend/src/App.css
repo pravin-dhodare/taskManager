@@ -17,8 +17,9 @@
   color: white;
   padding: 10px 20px;
   border-radius: 8px 8px 0 0;
-  display: inline-block;
+  display: inline-flex;
   justify-content: space-between;
+  align-items: center;
   gap: 20px;
 }
 

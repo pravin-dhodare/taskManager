@@ -1,5 +1,7 @@
 
 import React from 'react'
+import Button from '@mui/material/Button';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
 const PageTitle = ({text = "Page title"}) => {
   return (
@@ -11,6 +13,9 @@ const PageTitle = ({text = "Page title"}) => {
         </svg>
         {text}
       </h2>
+      <Button variant="outlined" startIcon={<PlaylistAddIcon />} sx={{ color: 'white' }}>
+        Add Task
+      </Button>
     </div>
   )
 }
