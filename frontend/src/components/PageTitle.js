@@ -3,7 +3,7 @@ import React from 'react'
 import Button from '@mui/material/Button';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
-const PageTitle = ({text = "Page title"}) => {
+const PageTitle = ({text = "Page title", onAddClick}) => {
   return (
     <div className="tm-page-title">
       <h2 className="tm-page-title-text">
@@ -13,7 +13,7 @@ const PageTitle = ({text = "Page title"}) => {
         </svg>
         {text}
       </h2>
-      <Button variant="outlined" startIcon={<PlaylistAddIcon />} sx={{ color: 'white' }}>
+      <Button variant="outlined" startIcon={<PlaylistAddIcon />} sx={{ color: 'white' }} onClick={onAddClick}>
         Add Task
       </Button>
     </div>

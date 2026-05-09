@@ -15,8 +15,9 @@ import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import TaskModal from './TaskModal';
 
-export default function TaskManager() {
+export default function TaskManager({ modalOpen, modalMode, modalData, handleClose, handleSubmit, onOpenView, onOpenEdit }) {
 
   function createData(title, description, deadline, status) {
     return { title, description, deadline, status };
@@ -29,61 +30,64 @@ export default function TaskManager() {
   ];
 
   return (
-    <TableContainer className="tm-table-container" component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Title</TableCell>
-            <TableCell align="right">Description</TableCell>
-            <TableCell align="right">Deadline</TableCell>
-            <TableCell align="right">Status</TableCell>
-            <TableCell align="right">Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.title}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {row.title}
-              </TableCell>
-              <TableCell align="right">{row.description}</TableCell>
-              <TableCell align="right">{row.deadline}</TableCell>
-              <TableCell align="right">
-                <RenderChip status={row.status} />
-              </TableCell>
-              <TableCell align="right">
-                <IconButton disabled aria-label="Failed" title="Failed to complete" size="small" color="secondary">
-                  <EventBusyIcon color="action" />
-                </IconButton>
-
-                <IconButton aria-label="Inprogress" title="Inpogress, Mark as Done" size="small" color="secondary">
-                  <EventRepeatIcon color="action" />
-                </IconButton>
-
-                <IconButton disabled aria-label="Done" title="Done" size="small" color="secondary">
-                  <EventAvailableIcon color="success" />
-                </IconButton>
-
-                <IconButton aria-label="View Task" title="View Task" size="small" color="secondary">
-                  <ViewHeadlineIcon />
-                </IconButton>
-
-                <IconButton aria-label="Edit Task" title="Edit Task" size="small">
-                  <EditNoteIcon color="primary" />
-                </IconButton>
-
-                <IconButton aria-label="Delete Task" title="Delete Task"  size="small">
-                  <DeleteSweepIcon sx={{ color: red[500] }} />
-                </IconButton>
-              </TableCell>
+    <>
+      <TableContainer className="tm-table-container" component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Title</TableCell>
+              <TableCell align="right">Description</TableCell>
+              <TableCell align="right">Deadline</TableCell>
+              <TableCell align="right">Status</TableCell>
+              <TableCell align="right">Action</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow
+                key={row.title}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {row.title}
+                </TableCell>
+                <TableCell align="right">{row.description}</TableCell>
+                <TableCell align="right">{row.deadline}</TableCell>
+                <TableCell align="right">
+                  <RenderChip status={row.status} />
+                </TableCell>
+                <TableCell align="right">
+                  <IconButton disabled aria-label="Failed" title="Failed to complete" size="small" color="secondary">
+                    <EventBusyIcon color="action" />
+                  </IconButton>
+
+                  <IconButton aria-label="Inprogress" title="Inpogress, Mark as Done" size="small" color="secondary">
+                    <EventRepeatIcon color="action" />
+                  </IconButton>
+
+                  <IconButton disabled aria-label="Done" title="Done" size="small" color="secondary">
+                    <EventAvailableIcon color="success" />
+                  </IconButton>
+
+                  <IconButton aria-label="View Task" title="View Task" size="small" color="secondary" onClick={() => onOpenView && onOpenView(row)}>
+                    <ViewHeadlineIcon />
+                  </IconButton>
+
+                  <IconButton aria-label="Edit Task" title="Edit Task" size="small" onClick={() => onOpenEdit && onOpenEdit(row)}>
+                    <EditNoteIcon color="primary" />
+                  </IconButton>
+
+                  <IconButton aria-label="Delete Task" title="Delete Task"  size="small">
+                    <DeleteSweepIcon sx={{ color: red[500] }} />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TaskModal open={modalOpen} mode={modalMode} initialData={modalData} onClose={handleClose} onSubmit={handleSubmit} />
+    </>
   )
 }
 
