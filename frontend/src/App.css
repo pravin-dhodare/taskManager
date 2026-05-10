@@ -32,3 +32,28 @@
 .tm-table-container {
   border-radius: 0 0 8px 8px !important;
 }
+
+/* Keep table layout fixed so cells can ellipsize reliably */
+.tm-table-container table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Description cell: clamp long text with ellipsis (single line). */
+.tm-desc {
+  max-width: 420px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Make an IconButton look active but be unclickable */
+.tm-inactive {
+  cursor: default !important;
+  opacity: 1 !important;
+}
+
+/* Change hover background for active action buttons (keep .tm-inactive using MUI default) */
+.tm-action .MuiIconButton-root:not(.tm-inactive):hover {
+  background-color: rgba(0, 123, 255, 0.2) !important;
+}

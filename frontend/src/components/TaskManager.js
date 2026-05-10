@@ -17,17 +17,12 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import TaskModal from './TaskModal';
 
-export default function TaskManager({ modalOpen, modalMode, modalData, handleClose, handleSubmit, onOpenView, onOpenEdit }) {
+export default function TaskManager({ data, modalOpen, modalMode, modalData, handleClose, handleSubmit, onOpenView, onOpenEdit, onDelete }) {
 
-  function createData(title, description, deadline, status) {
-    return { title, description, deadline, status };
-  }
+  console.log("Data", data);
+  
 
-  const rows = [
-    createData('Task A', 'Write tests', '2026-05-10', 'TODO'),
-    createData('Task B', 'Fix bug', '2026-05-12', 'DONE'),
-    createData('Task C', 'Deploy', '2026-05-15', 'IN_REVIEW'),
-  ];
+  
 
   return (
     <>
@@ -43,21 +38,21 @@ export default function TaskManager({ modalOpen, modalMode, modalData, handleClo
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {data.map((row) => (
               <TableRow
-                key={row.title}
+                key={row._id || row.id || row.title}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
                   {row.title}
                 </TableCell>
-                <TableCell align="right">{row.description}</TableCell>
+                <TableCell align="right" className="tm-desc">{row.description}</TableCell>
                 <TableCell align="right">{row.deadline}</TableCell>
                 <TableCell align="right">
                   <RenderChip status={row.status} />
                 </TableCell>
-                <TableCell align="right">
-                  <IconButton disabled aria-label="Failed" title="Failed to complete" size="small" color="secondary">
+                <TableCell className="tm-action" align="right">
+                  <IconButton aria-disabled="true" tabIndex={-1} className="tm-inactive" aria-label="Failed" title="Failed to complete" size="small" color="secondary" onClick={(e)=>e.preventDefault()} onMouseDown={(e)=>e.preventDefault()}>
                     <EventBusyIcon color="action" />
                   </IconButton>
 
@@ -65,7 +60,7 @@ export default function TaskManager({ modalOpen, modalMode, modalData, handleClo
                     <EventRepeatIcon color="action" />
                   </IconButton>
 
-                  <IconButton disabled aria-label="Done" title="Done" size="small" color="secondary">
+                  <IconButton aria-disabled="true" tabIndex={-1} className="tm-inactive" aria-label="Done" title="Done" size="small" color="secondary" onClick={(e)=>e.preventDefault()} onMouseDown={(e)=>e.preventDefault()}>
                     <EventAvailableIcon color="success" />
                   </IconButton>
 
@@ -77,7 +72,7 @@ export default function TaskManager({ modalOpen, modalMode, modalData, handleClo
                     <EditNoteIcon color="primary" />
                   </IconButton>
 
-                  <IconButton aria-label="Delete Task" title="Delete Task"  size="small">
+                  <IconButton aria-label="Delete Task" title="Delete Task"  size="small" onClick={() => onDelete && onDelete(row._id || row.id)}>
                     <DeleteSweepIcon sx={{ color: red[500] }} />
                   </IconButton>
                 </TableCell>
