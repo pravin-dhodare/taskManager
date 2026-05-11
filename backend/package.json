@@ -5,6 +5,9 @@
   "license": "ISC",
   "author": "pravindhodare",
   "type": "commonjs",
+  "engines": {
+    "node": "24.x"
+  },
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

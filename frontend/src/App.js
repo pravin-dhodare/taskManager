@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import TaskManager from './components/TaskManager';
 import PageTitle from './components/PageTitle';
