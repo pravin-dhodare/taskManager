@@ -1,10 +1,11 @@
+require("dotenv").config();
+
 const app = require("./app");
 const mongoose = require("mongoose");
 const config = require("./config/config");
-require("dotenv").config();
 
-const PORT = process.env.PORT;
-const connectionString = process.env.MONGODB_URI;
+const PORT = config.PORT;
+const connectionString = config.MONGODB_URI;
 
 mongoose.connect(connectionString, config.mongooseOptions)
   .then(() => {
