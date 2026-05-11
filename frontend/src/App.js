@@ -12,7 +12,9 @@ function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [modalData, setModalData] = useState(null);
-  const [allTask, setAllTask] = useState([])
+  const [allTask, setAllTask] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [fetchError, setFetchError] = useState(false)
 
   function handleOnAddClick() {
     setModalMode('add');
@@ -38,38 +40,52 @@ function App() {
 
   function handleSubmit(data) {
     (async () => {
+      setLoading(true);
       if (modalMode === 'add') {
         await createTask({ data });
       } else if (modalMode === 'edit') {
-        // ensure id is present
-        const payload = { ...data, id: data.id || data._id || modalData && (modalData.id || modalData._id) };
+        const payload = { ...data, id: data.id || data._id || (modalData && (modalData.id || modalData._id)) };
         await updateTask({ data: payload });
       }
-      // refresh list
       const result = await getAllTask();
-      if (result && result.ok) setAllTask(result.response || []);
+      setFetchError(!(result && result.ok));
+      setAllTask(result && result.ok ? result.response || [] : []);
+      setLoading(false);
       setModalOpen(false);
     })();
   }
 
   const handleDelete = (id) => {
     (async () => {
+      setLoading(true);
       await deleteTask({ id });
       const result = await getAllTask();
-      if (result && result.ok) setAllTask(result.response || []);
+      setFetchError(!(result && result.ok));
+      setAllTask(result && result.ok ? result.response || [] : []);
+      setLoading(false);
+    })();
+  }
+
+  const handleChangeStatus = (id, newStatus) => {
+    (async () => {
+      setLoading(true);
+      await updateTask({ data: { id, status: newStatus } });
+      const result = await getAllTask();
+      setFetchError(!(result && result.ok));
+      setAllTask(result && result.ok ? result.response || [] : []);
+      setLoading(false);
     })();
   }
 
   useEffect(() => {
     let mounted = true;
     (async () => {
+      setLoading(true);
       const result = await getAllTask();
       if (!mounted) return;
-      if (result && result.ok) {
-        setAllTask(result.response || []);
-      } else {
-        setAllTask([]);
-      }
+      setFetchError(!(result && result.ok));
+      setAllTask(result && result.ok ? result.response || [] : []);
+      setLoading(false);
     })();
     return () => { mounted = false; };
   }, []);
@@ -78,7 +94,7 @@ function App() {
     <div className="App">
       <div className="tm-app-container">
         <PageTitle text="Task Manager" onAddClick={handleOnAddClick} />
-        <TaskManager data={allTask} onOpenView={handleOpenView} onOpenEdit={handleOpenEdit} onDelete={handleDelete} />
+        <TaskManager data={allTask} loading={loading} error={fetchError} onOpenView={handleOpenView} onOpenEdit={handleOpenEdit} onDelete={handleDelete} onChangeStatus={handleChangeStatus} />
         <TaskModal open={modalOpen} mode={modalMode} initialData={modalData} onClose={handleClose} onSubmit={handleSubmit} />
       </div>
     </div>

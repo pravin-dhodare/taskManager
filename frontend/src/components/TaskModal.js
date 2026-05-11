@@ -21,17 +21,31 @@ export default function TaskModal({ open, mode = 'add', initialData = {}, onClos
   });
 
   useEffect(() => {
-    // Initialize form when the dialog is opened to avoid update loops
+    // Initialize form when the dialog is opened or initialData changes
     if (!open) return;
+
+    const rawDeadline = initialData?.deadline || initialData?.createdOn || '';
+    let deadlineValue = '';
+    if (rawDeadline) {
+      try {
+        // If ISO string, take YYYY-MM-DD part; if already date, use as-is
+        deadlineValue = typeof rawDeadline === 'string' && rawDeadline.length >= 10
+          ? rawDeadline.slice(0, 10)
+          : '';
+      } catch (e) {
+        deadlineValue = '';
+      }
+    }
+
     setForm({
       title: initialData?.title || '',
       description: initialData?.description || '',
-      deadline: initialData?.deadline || '',
+      deadline: deadlineValue,
       status: initialData?.status || 'TODO',
       file: null,
     });
-    // only run when `open` changes
-  }, [open]);
+    // run when `open` or `initialData` changes
+  }, [open, initialData]);
 
   const disabled = mode === 'view';
 

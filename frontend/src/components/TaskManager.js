@@ -1,4 +1,6 @@
 import React from 'react'
+import CircularProgress from '@mui/material/CircularProgress';
+import Typography from '@mui/material/Typography';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -17,10 +19,19 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import TaskModal from './TaskModal';
 
-export default function TaskManager({ data, modalOpen, modalMode, modalData, handleClose, handleSubmit, onOpenView, onOpenEdit, onDelete }) {
+export default function TaskManager({ loading, data, modalOpen, modalMode, modalData, handleClose, handleSubmit, onOpenView, onOpenEdit, onDelete, onChangeStatus }) {
 
   console.log("Data", data);
   
+  const formatDate = (raw) => {
+    if (!raw) return '';
+    try {
+      const d = new Date(raw);
+      if (!isNaN(d)) return d.toISOString().slice(0,10);
+    } catch (e) {}
+    // fallback: if it's already a string like YYYY-MM-DD or ISO, take first 10 chars
+    return typeof raw === 'string' && raw.length >= 10 ? raw.slice(0,10) : '';
+  };
 
   
 
@@ -38,7 +49,19 @@ export default function TaskManager({ data, modalOpen, modalMode, modalData, han
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row) => (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  <CircularProgress size={24} />
+                </TableCell>
+              </TableRow>
+            ) : (!data || data.length === 0) ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  <Typography variant="body2">No tasks available</Typography>
+                </TableCell>
+              </TableRow>
+            ) : data.map((row) => (
               <TableRow
                 key={row._id || row.id || row.title}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -47,22 +70,48 @@ export default function TaskManager({ data, modalOpen, modalMode, modalData, han
                   {row.title}
                 </TableCell>
                 <TableCell align="right" className="tm-desc">{row.description}</TableCell>
-                <TableCell align="right">{row.deadline}</TableCell>
+                <TableCell align="right">{formatDate(row.deadline)}</TableCell>
                 <TableCell align="right">
                   <RenderChip status={row.status} />
                 </TableCell>
                 <TableCell className="tm-action" align="right">
-                  <IconButton aria-disabled="true" tabIndex={-1} className="tm-inactive" aria-label="Failed" title="Failed to complete" size="small" color="secondary" onClick={(e)=>e.preventDefault()} onMouseDown={(e)=>e.preventDefault()}>
-                    <EventBusyIcon color="action" />
-                  </IconButton>
+                  {(() => {
+                    const id = row._id || row.id;
+                    // normalize status
+                    const s = (row.status || '').toString().trim().toUpperCase().replace(/\s+/g,'_');
+                    // parse deadline
+                    let isOverdue = false;
+                    if (row.deadline) {
+                      try {
+                        const d = new Date(row.deadline);
+                        isOverdue = !isNaN(d) && d < new Date();
+                      } catch (e) { isOverdue = false; }
+                    }
 
-                  <IconButton aria-label="Inprogress" title="Inpogress, Mark as Done" size="small" color="secondary">
-                    <EventRepeatIcon color="action" />
-                  </IconButton>
+                    if (isOverdue && (s === 'TODO' || s === 'IN_PROGRESS' || s === 'INPROGRESS')) {
+                      return (
+                        <IconButton aria-disabled="true" tabIndex={-1} className="tm-inactive" aria-label="Overdue" title="Task overdue" size="small" color="secondary" onClick={(e)=>e.preventDefault()} onMouseDown={(e)=>e.preventDefault()}>
+                          <EventBusyIcon sx={{color: red[500]}} />
+                        </IconButton>
+                      );
+                    }
 
-                  <IconButton aria-disabled="true" tabIndex={-1} className="tm-inactive" aria-label="Done" title="Done" size="small" color="secondary" onClick={(e)=>e.preventDefault()} onMouseDown={(e)=>e.preventDefault()}>
-                    <EventAvailableIcon color="success" />
-                  </IconButton>
+                    if (s === 'IN_PROGRESS' || s === 'INPROGRESS' || s === 'IN-PROGRESS') {
+                      // show Mark as Done
+                      return (
+                        <IconButton aria-label="Mark Done" title="Mark as Done" size="small" color="secondary" onClick={() => onChangeStatus && onChangeStatus(id, 'DONE')}>
+                          <EventAvailableIcon color="success" />
+                        </IconButton>
+                      );
+                    }
+
+                    // status TODO or DONE (or anything else) => show Start Progress
+                    return (
+                      <IconButton aria-label="Start Progress" title="Start Progress" size="small" color="secondary" onClick={() => onChangeStatus && onChangeStatus(id, 'IN_PROGRESS')}>
+                        <EventRepeatIcon color="action" />
+                      </IconButton>
+                    );
+                  })()}
 
                   <IconButton aria-label="View Task" title="View Task" size="small" color="secondary" onClick={() => onOpenView && onOpenView(row)}>
                     <ViewHeadlineIcon />
